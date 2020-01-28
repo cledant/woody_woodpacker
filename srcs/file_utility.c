@@ -3,10 +3,8 @@
 #include <fcntl.h>
 #include <elf.h>
 
-#include "wood_woodpacker.h"
-
 uint8_t
-loadBinary(char const *filename, void **filedata, size_t *filesize)
+loadBinary(char const *filename, void **filedata, uint64_t *filesize)
 {
     if (!filesize || !filedata) {
         return (1);
@@ -29,7 +27,7 @@ loadBinary(char const *filename, void **filedata, size_t *filesize)
 }
 
 uint8_t
-checkElf64(void const *binary, size_t filesize)
+checkElf64(void const *binary, uint64_t filesize)
 {
     if (!binary || filesize < sizeof(Elf64_Ehdr)) {
         return (1);
@@ -52,7 +50,7 @@ checkElf64(void const *binary, size_t filesize)
 uint8_t
 dumpModifiedBinary(char const *binary_name,
                    void const *binary,
-                   size_t binary_size)
+                   uint64_t binary_size)
 {
     if (!binary_name || !binary) {
         return (1);
@@ -67,18 +65,15 @@ dumpModifiedBinary(char const *binary_name,
         close(fd);
         return (1);
     }
-    if (write(fd, wwp_loader, wwp_loader_size) <= 0) {
-        close(fd);
-        return (1);
-    }
     close(fd);
     return (0);
 }
 
-void
-updateEntryPoint(void *binary, uint64_t binary_size)
+uint8_t
+checkDestination(uint64_t binary_start, uint64_t binary_size, uint64_t destination)
 {
-    Elf64_Ehdr *ehdr = binary;
-
-    ehdr->e_entry = binary_size;
+    (void)binary_size;
+    (void)binary_start;
+    (void)destination;
+    return (0);
 }

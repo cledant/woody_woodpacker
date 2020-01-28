@@ -39,7 +39,10 @@ main(int argc, char const **argv)
         cleanEnv(&env);
         return (-1);
     }
-    updateEntryPoint(env.binary, env.binary_size);
+    if (saveAndUpdateEntrypoint(env.binary, env.binary_size)) {
+        cleanEnv(&env);
+        return (-1);
+    }
     if (dumpModifiedBinary(MODIFIED_BINARY_NAME, env.binary, env.binary_size)) {
         printf("woody_woodpacker: Can't create file: %s\n",
                MODIFIED_BINARY_NAME);

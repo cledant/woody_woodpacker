@@ -6,6 +6,7 @@
 
 global wwp_loader
 global wwp_loader_size
+global old_entrypoint
 
 wwp_loader_size dq  end - wwp_loader
 
@@ -16,11 +17,15 @@ wwp_loader:
     mov rdx, woody.len
     mov rax, WRITE
     syscall
-    mov rax, EXIT
-    syscall
+
+real_program:
+    lea rdi, [rel old_entrypoint]
+    jmp rdi
 
 woody:
     .string db "....WOODY....", 10
     .len equ $ - woody.string
+
+old_entrypoint dq 0x0
 
 end:
