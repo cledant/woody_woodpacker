@@ -5,6 +5,7 @@
 #include <stdint.h>
 
 #define MODIFIED_BINARY_NAME "woody"
+#define RIP_OFFSET (wwp_rip_offset + 1)
 
 typedef struct woodyEnv
 {
@@ -15,7 +16,7 @@ typedef struct woodyEnv
 // loader.asm
 extern void wwp_loader();
 extern uint64_t wwp_loader_size;
-extern uint64_t old_entrypoint;
+extern uint64_t wwp_rip_offset;
 
 // file_utility.c
 uint8_t loadBinary(char const *filename, void **filedata, uint64_t *filesize);

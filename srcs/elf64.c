@@ -30,7 +30,7 @@ findExecPtLoad(Elf64_Ehdr const *ehdr)
         Elf64_Phdr *phdr = (Elf64_Phdr *)((uint64_t)ehdr + ehdr->e_phoff +
                                           ehdr->e_phentsize * i);
 
-        if (phdr->p_type == PT_LOAD && phdr->p_flags == (PF_X + PF_R)) {
+        if (phdr->p_type == PT_LOAD && phdr->p_flags == (PF_X | PF_R)) {
             return (phdr);
         }
     }
@@ -56,6 +56,7 @@ saveAndUpdateEntrypoint(void *binary, uint64_t binary_size)
         return (1);
     }
     // TODO check addition overflow
+    // TODO Check available size
     void *ptr_to_exec_code =
       (void *)((uint64_t)ehdr + executable_phdr->p_offset);
     if (checkDestination(
@@ -67,14 +68,19 @@ saveAndUpdateEntrypoint(void *binary, uint64_t binary_size)
     memcpy(ptr_to_exec_code + executable_phdr->p_filesz,
            wwp_loader,
            wwp_loader_size);
-    uint64_t *old_entrypoint = ptr_to_exec_code + executable_phdr->p_filesz +
-                               wwp_loader_size - sizeof(uint64_t);
-    *old_entrypoint = ((uint64_t)ptr_to_exec_code + executable_phdr->p_filesz) -
-                      (uint64_t)binary - ehdr->e_entry;
-    ehdr->e_entry = ((uint64_t)ptr_to_exec_code + executable_phdr->p_filesz) -
-                    (uint64_t)binary;
+
+    int64_t *old_entrypoint_offset = ptr_to_exec_code +
+                                     executable_phdr->p_filesz +
+                                     wwp_loader_size - sizeof(int64_t);
+
+    int64_t woody_entrypoint =
+      ((uint64_t)ptr_to_exec_code + executable_phdr->p_filesz) -
+      (uint64_t)binary;
+
+    *old_entrypoint_offset = ehdr->e_entry - woody_entrypoint - RIP_OFFSET;
+
+    ehdr->e_entry = woody_entrypoint;
     executable_phdr->p_filesz += wwp_loader_size;
     executable_phdr->p_memsz += wwp_loader_size;
-    printf("Old entrypoint %08lx\n", *old_entrypoint);
     return (0);
 }

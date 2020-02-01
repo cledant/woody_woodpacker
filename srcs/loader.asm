@@ -6,26 +6,42 @@
 
 global wwp_loader
 global wwp_loader_size
-global old_entrypoint
+global wwp_rip_offset
 
 wwp_loader_size dq  end - wwp_loader
+wwp_rip_offset dq  real_program - wwp_loader
 
 section .text
 wwp_loader:
-    lea rsi, [rel woody.string]
+    pushfq  ; Saving flags and register
+    push rdi
+    push rsi
+    push rdx
+    push rcx
+    push r8
+    push r9
+    lea rsi, [rel woody.string] ; Printing woody
     mov rdi, STDOUT
     mov rdx, woody.len
     mov rax, WRITE
     syscall
 
 real_program:
-    lea rdi, [rel old_entrypoint]
-    jmp rdi
+    lea rax, [rel $]    ; Loading rip + loading old entry point location
+    add rax, [rel offset_to_old_entrypoint]
+    pop r9  ; Restoring registers + flags before going to old entry point
+    pop r8
+    pop rcx
+    pop rdx
+    pop rsi
+    pop rdi
+    popfq
+    jmp rax
 
 woody:
     .string db "....WOODY....", 10
     .len equ $ - woody.string
 
-old_entrypoint dq 0x0
+offset_to_old_entrypoint dq 0x0
 
 end:
