@@ -21,7 +21,7 @@ displayHelp()
 int
 main(int argc, char const **argv)
 {
-    woodyEnv env = { NULL, 0 };
+    woodyEnv env = { NULL, 0, 0 };
 
     if (argc == 1 || argc > 2) {
         displayHelp();
@@ -39,7 +39,9 @@ main(int argc, char const **argv)
         cleanEnv(&env);
         return (-1);
     }
-    if (saveAndUpdateEntrypoint(env.binary, env.binary_size)) {
+    env.key = generateKey();
+    printf("Encryption key = %lu\n", env.key);
+    if (injectAndEncrypt(env.binary, env.binary_size, env.key)) {
         cleanEnv(&env);
         return (-1);
     }

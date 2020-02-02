@@ -6,7 +6,8 @@ add_executable(woody_woodpacker
 		srcs/woody_woodpacker.c
 		srcs/file_utility.c
 		srcs/loader.asm
-		srcs/elf64.c)
+		srcs/elf64.c
+		srcs/encrypt.c)
 target_include_directories(woody_woodpacker PRIVATE
 		includes)
 target_compile_options(woody_woodpacker PRIVATE

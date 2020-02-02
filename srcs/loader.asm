@@ -20,6 +20,8 @@ wwp_loader:
     push rcx
     push r8
     push r9
+    push r10
+    push r11
     lea rsi, [rel woody.string] ; Printing woody
     mov rdi, STDOUT
     mov rdx, woody.len
@@ -29,7 +31,9 @@ wwp_loader:
 real_program:
     lea rax, [rel $]    ; Loading rip + loading old entry point location
     add rax, [rel offset_to_old_entrypoint]
-    pop r9  ; Restoring registers + flags before going to old entry point
+    pop r11  ; Restoring registers + flags before going to old entry point
+    pop r10
+    pop r9
     pop r8
     pop rcx
     pop rdx

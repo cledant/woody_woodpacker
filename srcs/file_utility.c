@@ -68,12 +68,3 @@ dumpModifiedBinary(char const *binary_name,
     close(fd);
     return (0);
 }
-
-uint8_t
-checkDestination(uint64_t binary_start, uint64_t binary_size, uint64_t destination)
-{
-    (void)binary_size;
-    (void)binary_start;
-    (void)destination;
-    return (0);
-}
