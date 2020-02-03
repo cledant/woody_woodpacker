@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stdint.h>
 
+#define MIN_KEY_SIZE 16
+#define MAX_KEY_SIZE 32
 #define MODIFIED_BINARY_NAME "woody"
 
 // RIP_OFFSET should be check when loader is updated
@@ -13,8 +15,16 @@ typedef struct woodyEnv
 {
     void *binary;
     uint64_t binary_size;
-    uint64_t key;
+    char key[MAX_KEY_SIZE + 1];
+    uint64_t current_key_size;
 } woodyEnv;
+
+typedef struct loaderData
+{
+    uint64_t offset_to_entryoint;
+    char key[MAX_KEY_SIZE];
+    uint8_t key_len;
+} loaderData;
 
 // loader.asm
 extern void wwp_loader();
@@ -29,10 +39,16 @@ uint8_t dumpModifiedBinary(char const *binary_name,
                            uint64_t binary_size);
 
 // elf64.c
-uint8_t injectAndEncrypt(void *binary, uint64_t binary_size, uint64_t key);
+uint8_t injectAndEncrypt(void *binary,
+                         uint64_t binary_size,
+                         char const *key,
+                         uint64_t key_size);
 
 // encrypt.c
-uint64_t generateKey();
-void encryptData(uint64_t key, void *start, uint64_t size);
+uint8_t generateKey(char *key, uint64_t *key_size);
+void encryptData(char const *key,
+                 uint8_t *start,
+                 uint64_t size,
+                 uint64_t key_size);
 
 #endif

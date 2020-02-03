@@ -4,6 +4,8 @@
 %define WRITE   1
 %define EXIT    60
 
+%define KEY_LEN 32
+
 global wwp_loader
 global wwp_loader_size
 global wwp_rip_offset
@@ -46,6 +48,9 @@ woody:
     .string db "....WOODY....", 10
     .len equ $ - woody.string
 
-offset_to_old_entrypoint dq 0x0
+data:
+    offset_to_old_entrypoint dq 0x0
+    key times KEY_LEN db 0x0
+    key_len db 0x0
 
 end:

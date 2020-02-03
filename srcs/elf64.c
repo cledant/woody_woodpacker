@@ -32,7 +32,10 @@ findPtLoadHeaderWithRX(Elf64_Ehdr const *ehdr)
 }
 
 uint8_t
-injectAndEncrypt(void *binary, uint64_t binary_size, uint64_t key)
+injectAndEncrypt(void *binary,
+                 uint64_t binary_size,
+                 char const *key,
+                 uint64_t key_size)
 {
     Elf64_Ehdr *ehdr = binary;
     Elf64_Phdr *executable_phdr = NULL;
@@ -53,22 +56,28 @@ injectAndEncrypt(void *binary, uint64_t binary_size, uint64_t key)
     }
 
     // Encrypting data
-    encryptData(key, ptr_to_exec_code, executable_phdr->p_filesz);
+    encryptData(key, ptr_to_exec_code, executable_phdr->p_filesz, key_size);
+    // TODO REMOVE WHEN DECRYPT IN ASM
+    encryptData(key, ptr_to_exec_code, executable_phdr->p_filesz, key_size);
 
     // Copy loader
     memcpy(ptr_to_exec_code + executable_phdr->p_filesz,
            wwp_loader,
            wwp_loader_size);
 
-    // Computing loader jump to real entry point + updating entry point to
-    // loader location
-    int64_t *old_entrypoint_offset = ptr_to_exec_code +
-                                     executable_phdr->p_filesz +
-                                     wwp_loader_size - sizeof(int64_t);
+    // Computing loader jump to real entry point
+    // updating entry point to loader location + setting key
+    loaderData *loader_data = ptr_to_exec_code + executable_phdr->p_filesz +
+                              wwp_loader_size - sizeof(uint64_t) -
+                              sizeof(char) * MAX_KEY_SIZE - sizeof(char);
     int64_t woody_entrypoint =
       ((uint64_t)ptr_to_exec_code + executable_phdr->p_filesz) -
       (uint64_t)binary;
-    *old_entrypoint_offset = ehdr->e_entry - woody_entrypoint - RIP_OFFSET;
+    loader_data->offset_to_entryoint =
+      ehdr->e_entry - woody_entrypoint - RIP_OFFSET;
+    loader_data->key_len = key_size;
+    memcpy(loader_data->key, key, key_size);
+
     ehdr->e_entry = woody_entrypoint;
     executable_phdr->p_filesz += wwp_loader_size;
     executable_phdr->p_memsz += wwp_loader_size;

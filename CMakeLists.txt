@@ -11,4 +11,4 @@ add_executable(woody_woodpacker
 target_include_directories(woody_woodpacker PRIVATE
 		includes)
 target_compile_options(woody_woodpacker PRIVATE
-		$<$<COMPILE_LANGUAGE:C>:-Wall -Wextra -Werror -std=c11>)
+		$<$<COMPILE_LANGUAGE:C>:-Wall -Wextra -Werror -std=gnu11>)
