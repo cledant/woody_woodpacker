@@ -31,8 +31,32 @@ wwp_loader:
     syscall
 
 real_program:
-    lea rax, [rel $]    ; Loading rip + loading old entry point location
-    add rax, [rel offset_to_old_entrypoint]
+    lea r11, [rel $]    ; Loading rip + loading old entry point location
+    add r11, [rel offset_to_old_entrypoint]
+
+decrypt:
+    mov rsi, r11    ; Loading code location
+    add rsi, [rel offset_to_exec_pt_load]
+    mov r8, [rel key_len]
+    mov r9, [rel exec_pt_load_size]
+    xor rcx, rcx    ; Counter for total pt_load size
+
+loop:
+    mov rax, rcx
+    div r8
+    lea rdi, [rel key]
+    add rdi, rdx
+    mov rax, [rdi]
+    mov r10, [rsi]
+;    xor al, r10b
+;    mov dl, al
+    inc rsi
+    inc rcx
+    cmp rcx, r9
+    jne loop
+
+running_real_program:
+    mov rax, r11
     pop r11  ; Restoring registers + flags before going to old entry point
     pop r10
     pop r9
@@ -49,6 +73,8 @@ woody:
     .len equ $ - woody.string
 
 data:
+    offset_to_exec_pt_load dq 0x0
+    exec_pt_load_size dq 0x0
     offset_to_old_entrypoint dq 0x0
     key times KEY_LEN db 0x0
     key_len db 0x0

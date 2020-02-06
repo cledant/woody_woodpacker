@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <elf.h>
+#include <stdlib.h>
 
 #include "wood_woodpacker.h"
 
@@ -66,18 +67,23 @@ injectAndEncrypt(void *binary,
            wwp_loader_size);
 
     // Computing loader jump to real entry point
-    // updating entry point to loader location + setting key
     loaderData *loader_data = ptr_to_exec_code + executable_phdr->p_filesz +
-                              wwp_loader_size - sizeof(uint64_t) -
+                              wwp_loader_size - 3 * sizeof(uint64_t) -
                               sizeof(char) * MAX_KEY_SIZE - sizeof(char);
     int64_t woody_entrypoint =
       ((uint64_t)ptr_to_exec_code + executable_phdr->p_filesz) -
       (uint64_t)binary;
-    loader_data->offset_to_entryoint =
+    loader_data->offset_to_old_entryoint =
       ehdr->e_entry - woody_entrypoint - RIP_OFFSET;
+    // Inserting key
     loader_data->key_len = key_size;
     memcpy(loader_data->key, key, key_size);
+    // Inserting executable ph_hdr offset and size
+    loader_data->exec_pt_load_size = executable_phdr->p_filesz;
+    loader_data->offset_to_exec_pt_load =
+      executable_phdr->p_offset - ehdr->e_entry;
 
+    // Updating entry point to loader location
     ehdr->e_entry = woody_entrypoint;
     executable_phdr->p_filesz += wwp_loader_size;
     executable_phdr->p_memsz += wwp_loader_size;

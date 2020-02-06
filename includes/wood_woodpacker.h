@@ -21,7 +21,9 @@ typedef struct woodyEnv
 
 typedef struct loaderData
 {
-    uint64_t offset_to_entryoint;
+    uint64_t offset_to_exec_pt_load;
+    uint64_t exec_pt_load_size;
+    uint64_t offset_to_old_entryoint;
     char key[MAX_KEY_SIZE];
     uint8_t key_len;
 } loaderData;
