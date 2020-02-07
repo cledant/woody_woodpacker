@@ -25,7 +25,8 @@ findPtLoadHeaderWithRX(Elf64_Ehdr const *ehdr)
         Elf64_Phdr *phdr = (Elf64_Phdr *)((uint64_t)ehdr + ehdr->e_phoff +
                                           ehdr->e_phentsize * i);
 
-        if (phdr->p_type == PT_LOAD && phdr->p_flags == (PF_X | PF_R)) {
+        if (phdr->p_type == PT_LOAD && (phdr->p_flags & PF_X) &&
+            (phdr->p_flags & PF_R)) {
             return (phdr);
         }
     }
@@ -59,7 +60,7 @@ injectAndEncrypt(void *binary,
     // Encrypting data
     encryptData(key, ptr_to_exec_code, executable_phdr->p_filesz, key_size);
     // TODO REMOVE WHEN DECRYPT IN ASM
-    encryptData(key, ptr_to_exec_code, executable_phdr->p_filesz, key_size);
+    // encryptData(key, ptr_to_exec_code, executable_phdr->p_filesz, key_size);
 
     // Copy loader
     memcpy(ptr_to_exec_code + executable_phdr->p_filesz,
@@ -82,6 +83,8 @@ injectAndEncrypt(void *binary,
     loader_data->exec_pt_load_size = executable_phdr->p_filesz;
     loader_data->offset_to_exec_pt_load =
       executable_phdr->p_offset - ehdr->e_entry;
+    // Adding write right
+    executable_phdr->p_flags = (PF_X | PF_R | PF_W);
 
     // Updating entry point to loader location
     ehdr->e_entry = woody_entrypoint;

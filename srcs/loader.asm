@@ -46,10 +46,10 @@ loop:
     div r8
     lea rdi, [rel key]
     add rdi, rdx
-    mov rax, [rdi]
-    mov r10, [rsi]
-;    xor al, r10b
-;    mov dl, al
+    mov rax, [rsi]
+    mov r10, [rdi]
+    xor al, r10b
+    mov byte [rsi], al
     inc rsi
     inc rcx
     cmp rcx, r9
