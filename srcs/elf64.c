@@ -65,8 +65,8 @@ injectAndEncrypt(void *binary,
 
     // Computing loader jump to real entry point
     loaderData *loader_data = ptr_to_exec_code + executable_phdr->p_filesz +
-                              wwp_loader_size - 3 * sizeof(uint64_t) -
-                              sizeof(char) * MAX_KEY_SIZE - sizeof(char);
+                              wwp_loader_size - 4 * sizeof(uint64_t) -
+                              sizeof(char) * MAX_KEY_SIZE;
     int64_t woody_entrypoint =
       ((uint64_t)ptr_to_exec_code + executable_phdr->p_filesz) -
       (uint64_t)binary;

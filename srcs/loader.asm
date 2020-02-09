@@ -77,6 +77,6 @@ data:
     exec_pt_load_size dq 0x0
     offset_to_old_entrypoint dq 0x0
     key times KEY_LEN db 0x0
-    key_len db 0x0
+    key_len dq 0x0
 
 end:
