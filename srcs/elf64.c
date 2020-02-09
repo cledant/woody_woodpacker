@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <elf.h>
-#include <stdlib.h>
+#include <string.h>
 
 #include "wood_woodpacker.h"
 
@@ -13,8 +13,6 @@ checkAvailableSpace(void *startOfPadding, void *endOfFile)
         ++startOfPadding;
         ++freeSpace;
     }
-    printf("---> Free space in PT_LOAD with RX = %lu\n", freeSpace);
-    printf("---> Required space = %lu\n", wwp_loader_size);
     return (freeSpace);
 }
 
@@ -59,8 +57,6 @@ injectAndEncrypt(void *binary,
 
     // Encrypting data
     encryptData(key, ptr_to_exec_code, executable_phdr->p_filesz, key_size);
-    // TODO REMOVE WHEN DECRYPT IN ASM
-    // encryptData(key, ptr_to_exec_code, executable_phdr->p_filesz, key_size);
 
     // Copy loader
     memcpy(ptr_to_exec_code + executable_phdr->p_filesz,

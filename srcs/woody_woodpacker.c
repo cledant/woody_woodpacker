@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/mman.h>
+#include <stdlib.h>
 
 #include "wood_woodpacker.h"
 
@@ -43,12 +44,15 @@ cleanEnv(woodyEnv *env)
     if (env->binary && env->binary != MAP_FAILED) {
         munmap(env->binary, env->binary_size);
     }
+    if (env->binary_copy) {
+        free(env->binary_copy);
+    }
 }
 
 int
 main(int argc, char const **argv)
 {
-    woodyEnv env = { NULL, 0, { 0 }, 0 };
+    woodyEnv env = { NULL, 0, { 0 }, 0, NULL };
 
     if (checkArgs(argc, argv, env.key, &env.current_key_size)) {
         return (-1);
@@ -73,7 +77,13 @@ main(int argc, char const **argv)
         cleanEnv(&env);
         return (-1);
     }
-    if (dumpModifiedBinary(MODIFIED_BINARY_NAME, env.binary, env.binary_size)) {
+    if (copyBinary(env.binary, &env.binary_copy, env.binary_size)) {
+        printf("woody_woodpacker: Failed to copy binary\n");
+        cleanEnv(&env);
+        return (-1);
+    }
+    if (dumpModifiedBinary(
+          MODIFIED_BINARY_NAME, env.binary_copy, env.binary_size)) {
         printf("woody_woodpacker: Can't create file: %s\n",
                MODIFIED_BINARY_NAME);
         cleanEnv(&env);

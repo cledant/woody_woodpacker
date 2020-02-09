@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <elf.h>
+#include <stdlib.h>
+#include <string.h>
 
 uint8_t
 loadBinary(char const *filename, void **filedata, uint64_t *filesize)
@@ -44,6 +46,20 @@ checkElf64(void const *binary, uint64_t filesize)
         (ehdr->e_type != ET_EXEC && ehdr->e_type != ET_DYN)) {
         return (1);
     }
+    return (0);
+}
+
+uint8_t
+copyBinary(void const *binary, void **cpy, uint64_t size)
+{
+    if (!binary || !cpy) {
+        return (1);
+    }
+
+    if (!(*cpy = (void *)malloc(size))) {
+        return (1);
+    }
+    memcpy(*cpy, binary, size);
     return (0);
 }
 

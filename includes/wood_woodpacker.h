@@ -1,7 +1,6 @@
 #ifndef WOODY_WOODPACKER_H
 #define WOODY_WOODPACKER_H
 
-#include <string.h>
 #include <stdint.h>
 
 #define MIN_KEY_SIZE 16
@@ -17,6 +16,7 @@ typedef struct woodyEnv
     uint64_t binary_size;
     char key[MAX_KEY_SIZE + 1];
     uint64_t current_key_size;
+    void *binary_copy;
 } woodyEnv;
 
 typedef struct loaderData
@@ -36,6 +36,7 @@ extern uint64_t wwp_rip_offset;
 // file_utility.c
 uint8_t loadBinary(char const *filename, void **filedata, uint64_t *filesize);
 uint8_t checkElf64(void const *binary, uint64_t filesize);
+uint8_t copyBinary(void const *binary, void **cpy, uint64_t size);
 uint8_t dumpModifiedBinary(char const *binary_name,
                            void const *binary,
                            uint64_t binary_size);
