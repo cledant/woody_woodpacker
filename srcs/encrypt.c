@@ -30,7 +30,10 @@ generateKey(char *key, uint64_t *key_size)
 }
 
 void
-encryptData(char const *key, uint8_t *data, uint64_t data_size, uint64_t key_size)
+encryptData(char const *key,
+            uint8_t *data,
+            uint64_t data_size,
+            uint64_t key_size)
 {
     for (uint64_t i = 0; i < data_size; ++i) {
         data[i] = data[i] ^ key[i % key_size];

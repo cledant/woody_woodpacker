@@ -51,7 +51,9 @@ injectAndEncrypt(void *binary,
     // Checking if there is enough space to copy loader
     if (checkAvailableSpace(ptr_to_exec_code + executable_phdr->p_filesz,
                             binary + binary_size) < wwp_loader_size) {
-        printf("woody_woodpacker: Can't insert loader\n");
+        printf("woody_woodpacker: Not enough space to insert loader.\n%zu "
+               "bytes are required.\n",
+               wwp_loader_size);
         return (1);
     }
 

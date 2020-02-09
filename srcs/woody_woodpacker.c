@@ -9,7 +9,7 @@ static void
 displayHelp()
 {
     printf("Usage: ./woody_woodpacker elf64_binary [encryption key]\n");
-    printf("\tEncryption key size needs to be between %u and %u\n",
+    printf("\tUser custom encryption key size needs to be between %u and %u\n",
            MIN_KEY_SIZE,
            MAX_KEY_SIZE);
 }
