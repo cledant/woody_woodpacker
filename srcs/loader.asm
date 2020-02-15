@@ -42,6 +42,7 @@ decrypt:
     xor rcx, rcx    ; Counter for total pt_load size
 
 loop:
+    xor rdx, rdx    ; clear remainder
     mov rax, rcx
     div r8
     lea rdi, [rel key]
