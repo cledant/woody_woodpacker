@@ -47,6 +47,8 @@ injectAndEncrypt(void *binary,
     }
     void *ptr_to_exec_code =
       (void *)((uint64_t)ehdr + executable_phdr->p_offset);
+    void *ptr_to_exec_code_in_mem =
+      (void *)((uint64_t)ehdr + executable_phdr->p_vaddr);
 
     // Checking if there is enough space to copy loader
     if (checkAvailableSpace(ptr_to_exec_code + executable_phdr->p_filesz,
@@ -70,7 +72,7 @@ injectAndEncrypt(void *binary,
                               wwp_loader_size - 4 * sizeof(uint64_t) -
                               sizeof(char) * MAX_KEY_SIZE;
     int64_t woody_entrypoint =
-      ((uint64_t)ptr_to_exec_code + executable_phdr->p_filesz) -
+      ((uint64_t)ptr_to_exec_code_in_mem + executable_phdr->p_filesz) -
       (uint64_t)binary;
     loader_data->offset_to_old_entryoint =
       ehdr->e_entry - woody_entrypoint - RIP_OFFSET;
@@ -80,7 +82,7 @@ injectAndEncrypt(void *binary,
     // Inserting executable ph_hdr offset and size
     loader_data->exec_pt_load_size = executable_phdr->p_filesz;
     loader_data->offset_to_exec_pt_load =
-      executable_phdr->p_offset - ehdr->e_entry;
+      executable_phdr->p_vaddr - ehdr->e_entry;
     // Adding write right
     executable_phdr->p_flags = (PF_X | PF_R | PF_W);
 
